@@ -1,0 +1,947 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>TGUI — Trojan-Go Minimal UI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <style>
+    :root{
+      --bg: #0b0f14;
+      --bg-elev: #121824;
+      --panel: #111826;
+      --panel-2: #0f1521;
+      --border: #1f2a3c;
+      --muted: #8aa0bf;
+      --text: #e6eefc;
+      --text-dim: #aab6cf;
+      --primary: #3b82f6;
+      --primary-600: #2563eb;
+      --success: #22c55e;
+      --success-600: #16a34a;
+      --warning: #fbbf24;
+      --danger: #ef4444;
+      --danger-600: #dc2626;
+      --accent: #a78bfa;
+      --shadow: 0 10px 30px rgba(0,0,0,0.35);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --radius-xs: 6px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 800px at 10% -10%, rgba(59,130,246,0.10), transparent 60%),
+        radial-gradient(1000px 700px at 110% 10%, rgba(167,139,250,0.12), transparent 60%),
+        linear-gradient(to bottom, #0a0f16, #0b1017 30%, #0b0f14);
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 28px auto 48px;
+      padding: 0 18px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .logo {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(59,130,246,0.3), rgba(167,139,250,0.3));
+      display: grid; place-items: center;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06), var(--shadow);
+    }
+    .logo svg { opacity: 0.9 }
+    h1 {
+      font-size: 20px; margin: 0;
+      letter-spacing: 0.2px;
+    }
+    .subtitle {
+      margin-top: 4px;
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+
+    /* Cards */
+    .card {
+      background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+    .card .card-header {
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card .card-body { padding: 16px; }
+
+    /* Collapsible behavior */
+    .card-header.toggle { cursor: pointer; user-select: none; }
+    .chev {
+      display: inline-block;
+      transform: rotate(0deg);
+      transition: transform 0.2s ease;
+      margin-right: 8px;
+      opacity: 0.9;
+    }
+    .collapsible .card-body { display: none; }
+    .collapsible.open .card-body { display: block; }
+    .collapsible.open .chev { transform: rotate(90deg); }
+
+    .fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 640px) {
+      .fields { grid-template-columns: 1fr; }
+    }
+
+    label {
+      color: var(--text-dim);
+      font-size: 12px;
+      display: block;
+      margin-bottom: 6px;
+      letter-spacing: 0.2px;
+    }
+
+    .field {
+      background: #0e1420;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+    .field:focus-within {
+      border-color: rgba(59,130,246,0.6);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+      background: #0f1624;
+    }
+    .field input, .field select {
+      width: 100%;
+      background: transparent;
+      border: 0;
+      color: var(--text);
+      outline: none;
+      font-size: 14px;
+      padding: 6px 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    .muted { color: var(--muted); font-size: 12px; }
+    .subtle { color: var(--text-dim); font-size: 12px; }
+
+    .inline { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .row-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+
+    .btn {
+      appearance: none; border: 0; cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: white; font-weight: 600; letter-spacing: 0.2px;
+      background: #1b2637;
+      border: 1px solid var(--border);
+      transition: transform 0.04s ease, background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+    }
+    .btn:hover { background: #213149; }
+    .btn:active { transform: translateY(1px); }
+    .btn-sm { padding: 6px 9px; border-radius: 8px; font-weight: 600; }
+    .btn-primary {
+      background: linear-gradient(180deg, var(--primary), var(--primary-600));
+      border-color: rgba(59,130,246,0.4);
+      box-shadow: 0 8px 20px rgba(37,99,235,0.25);
+    }
+    .btn-ghost {
+      background: transparent; border-color: var(--border); color: var(--text);
+    }
+    .btn-danger {
+      background: linear-gradient(180deg, var(--danger), var(--danger-600));
+      border-color: rgba(239,68,68,0.4);
+      box-shadow: 0 8px 20px rgba(220,38,38,0.25);
+    }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 12px; padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--text);
+      background: rgba(255,255,255,0.02);
+    }
+    .badge-success { border-color: rgba(34,197,94,0.35); background: rgba(34,197,94,0.12); color: #bbf7d0; }
+    .badge-danger { border-color: rgba(239,68,68,0.35); background: rgba(239,68,68,0.12); color: #fecaca; }
+    .badge-muted  { border-color: rgba(148,163,184,0.35); background: rgba(148,163,184,0.10); color: #cbd5e1; }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.02) inset;
+    }
+    .dot.live { background: var(--success); box-shadow: 0 0 10px rgba(34,197,94,0.6); }
+    .dot.idle { background: #64748b; }
+    .dot.enabled { background: #10b981; }
+    .dot.disabled { background: #ef4444; }
+
+    table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; box-shadow: var(--shadow);
+      background: linear-gradient(180deg, var(--panel), var(--panel-2));
+    }
+    thead th {
+      text-align: left; font-weight: 700; font-size: 12px; letter-spacing: 0.4px;
+      color: var(--text-dim);
+      background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 12px;
+      position: sticky; top: 0; z-index: 1;
+      backdrop-filter: blur(6px);
+      user-select: none;
+    }
+    thead th.sortable { cursor: pointer; }
+    thead th.sortable:hover { background: rgba(59,130,246,0.10); }
+    thead th .sort-indicator {
+      margin-left: 6px; opacity: 0.6; font-size: 10px;
+    }
+    thead th.sorted .sort-indicator { opacity: 1; }
+
+    tbody td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      vertical-align: top;
+    }
+    tbody tr:hover td { background: rgba(59,130,246,0.05); }
+    .nowrap { white-space: nowrap; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+
+    .url-box {
+      display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start;
+      max-width: 560px;
+    }
+    .url-code {
+      display: block;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      background: #0c1422;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+      padding: 8px 10px;
+      font-size: 12px;
+      color: #dce6ff;
+      line-height: 1.25;
+      max-height: calc(1.25em * 3); /* show up to 3 lines */
+      overflow: auto; /* scroll if longer */
+    }
+
+    .toast {
+      position: fixed; bottom: 18px; right: 18px;
+      background: #0e1726;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      min-width: 160px;
+      display: flex; align-items: center; gap: 10px;
+      animation: toastIn 220ms ease-out forwards;
+      z-index: 9999;
+      font-size: 13px;
+    }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Filter bar */
+    .filter-bar {
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    }
+    .filter-input {
+      min-width: 220px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="title">
+        <div class="logo" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M4 6.5C4 5.12 5.12 4 6.5 4h5c.53 0 1.04.21 1.41.59l4.5 4.5c.38.37.59.88.59 1.41v6.5A2.5 2.5 0 0 1 16 19.5H6.5A2.5 2.5 0 0 1 4 17V6.5z" fill="url(#g)"/>
+            <defs>
+              <linearGradient id="g" x1="4" y1="4" x2="20" y2="20" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#60A5FA"/><stop offset="1" stop-color="#A78BFA"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div>
+          <h1>TGUI — Trojan-Go Minimal UI</h1>
+          <div class="subtitle">Manage users, quotas, expiry, and share trojan:// links</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Top: Collapsible Add/Edit Panel (collapsed by default) -->
+    <div class="card collapsible" id="user-panel">
+      <div class="card-header toggle" id="user-panel-toggle" aria-expanded="false">
+        <div class="inline">
+          <span class="chev">▶</span>
+          <strong>Add / Edit User</strong>
+        </div>
+        <div class="inline">
+          <button type="button" id="new-user" class="btn btn-primary btn-sm" title="Create a new user">New User</button>
+          <button type="button" id="clear" class="btn btn-ghost btn-sm" title="Clear form">Clear</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <form id="user-form" autocomplete="off" spellcheck="false">
+          <input type="hidden" id="user-id">
+          <input type="hidden" id="orig-username">
+
+          <div class="fields">
+            <div>
+              <label for="username">Username</label>
+              <div class="field">
+                <input id="username" class="mono" placeholder="alice">
+              </div>
+            </div>
+
+            <div>
+              <label for="plain_password">Password (plain)</label>
+              <div class="field" style="gap:6px;">
+                <input id="plain_password" class="mono" placeholder="Strong password">
+                <button type="button" class="btn btn-ghost btn-sm" id="toggle_pw" title="Show/Hide password">👁️</button>
+                <button type="button" class="btn btn-ghost btn-sm" id="copy_pw" title="Copy password">⧉</button>
+              </div>
+              <div class="inline" style="margin-top:8px;">
+                <button type="button" id="gen_pass" class="btn btn-sm" title="Generate a random password">Generate</button>
+                <span class="subtle">Length</span>
+                <div class="field" style="padding:0 8px; width:100px;">
+                  <input id="gen_len" type="number" min="8" max="64" value="16" style="padding:6px 0;">
+                </div>
+                <span class="subtle">Ambiguous characters avoided. Includes upper/lower/digits/symbols.</span>
+              </div>
+            </div>
+
+            <div>
+              <label for="display_name">Display Name (optional)</label>
+              <div class="field">
+                <input id="display_name" placeholder="Alice (US-1)">
+              </div>
+            </div>
+
+            <div>
+              <label>Quota</label>
+              <div class="inline" style="gap:10px;">
+                <div class="field" style="width:160px;">
+                  <select id="quota_unit">
+                    <option value="unlimited">Unlimited</option>
+                    <option value="gb">GB</option>
+                  </select>
+                </div>
+                <div class="field" style="width:140px;">
+                  <input id="quota_value" type="number" min="1" placeholder="50" disabled>
+                </div>
+              </div>
+              <div class="subtle">Unlimited = -1 bytes. GB uses powers of two (1 GB = 1,073,741,824 bytes).</div>
+            </div>
+
+            <div>
+              <label for="expires_at">Expiry Date (UTC) (optional)</label>
+              <div class="field">
+                <input id="expires_at" type="datetime-local">
+              </div>
+            </div>
+          </div>
+
+          <div class="row-actions">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="button" id="clear2" class="btn btn-ghost">Reset Form</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Bottom: Users Table -->
+    <div class="card">
+      <div class="card-header">
+        <strong>Users</strong>
+        <div class="filter-bar">
+          <div class="field filter-input" title="Filter by username or display name">
+            <input id="filterText" placeholder="Filter by username or display name…">
+          </div>
+          <button class="btn btn-ghost btn-sm" id="clearFilter">Clear</button>
+          <span class="subtle">Refreshes every 5s. Live = traffic delta ≥ 300 B.</span>
+        </div>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <table id="users-table">
+          <thead>
+            <tr>
+              <th class="nowrap sortable" data-key="id">ID <span class="sort-indicator"></span></th>
+              <th class="sortable" data-key="live">Live <span class="sort-indicator"></span></th>
+              <th class="sortable" data-key="enabled">Enabled <span class="sort-indicator"></span></th>
+              <th class="sortable" data-key="username">Username <span class="sort-indicator"></span></th>
+              <th class="sortable" data-key="name">Display Name <span class="sort-indicator"></span></th>
+              <th class="sortable" data-key="used_bytes">Used <span class="sort-indicator"></span></th>
+              <th class="sortable" data-key="remaining_bytes">Remaining <span class="sort-indicator"></span></th>
+              <th class="sortable" data-key="remaining_days">Days Left <span class="sort-indicator"></span></th>
+              <th data-sortable="false">trojan:// URL</th>
+              <th data-sortable="false">Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const $ = s => document.querySelector(s);
+    const tbody = $('#users-table tbody');
+    const thead = $('#users-table thead');
+
+    // Collapsible panel controls
+    const panel = $('#user-panel');
+    const panelToggle = $('#user-panel-toggle');
+    function setPanelOpen(open) {
+      panel.classList.toggle('open', open);
+      panelToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    // Collapsed by default
+    setPanelOpen(false);
+    panelToggle?.addEventListener('click', (e) => {
+      if (e.target.closest('button')) return;
+      setPanelOpen(!panel.classList.contains('open'));
+    });
+    $('#new-user').addEventListener('click', () => {
+      enterCreateMode();
+      setPanelOpen(true);
+      $('#username').focus();
+    });
+
+    // Toast helper
+    function toast(msg) {
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.textContent = msg;
+      document.body.appendChild(el);
+      setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateY(10px)'; }, 2000);
+      setTimeout(() => el.remove(), 2600);
+    }
+
+    // Keep the last used_bytes per user to detect "live" activity
+    let prevUsage = new Map(); // id -> BigInt(used_bytes)
+    const LIVE_THRESHOLD = 300n; // bytes per refresh interval
+
+    // Sorting state
+    let sortKey = 'id';
+    let sortDir = 'asc'; // 'asc' | 'desc'
+
+    // Filter state
+    let filterText = '';
+
+    // Cache of last fetched users + computed fields
+    let currentUsers = []; // array of { ...u, enabled, live, usedB, remainingB, remainingDaysNum }
+
+    // Secure random helpers for password generation
+    function getRandomInt(maxExclusive) {
+      const max = Math.floor(maxExclusive);
+      if (max <= 0) return 0;
+      const range = 256;
+      const buckets = Math.floor(range / max) * max;
+      let x = 0;
+      const arr = new Uint8Array(1);
+      do { crypto.getRandomValues(arr); x = arr[0]; } while (x >= buckets);
+      return x % max;
+    }
+    function shuffleArraySecure(arr) {
+      for (let i = arr.length - 1; i > 0; i--) { const j = getRandomInt(i + 1); [arr[i], arr[j]] = [arr[j], arr[i]]; }
+      return arr;
+    }
+    function randomPassword(len) {
+      const length = Math.min(64, Math.max(8, Number(len) || 16));
+      const lower = "abcdefghjkmnpqrstuvwxyz";
+      const upper = "ABCDEFGHJKMNPQRSTUVWXYZ";
+      const digits = "23456789";
+      const symbols = "!@#$%^&*()-_=+[]{};:,.?";
+      const all = lower + upper + digits + symbols;
+      const chars = [];
+      chars.push(lower[getRandomInt(lower.length)]);
+      chars.push(upper[getRandomInt(upper.length)]);
+      chars.push(digits[getRandomInt(digits.length)]);
+      chars.push(symbols[getRandomInt(symbols.length)]);
+      for (let i = chars.length; i < length; i++) { chars.push(all[getRandomInt(all.length)]); }
+      shuffleArraySecure(chars);
+      return chars.join('');
+    }
+
+    // Form helpers
+    $('#quota_unit').addEventListener('change', (e) => { $('#quota_value').disabled = e.target.value !== 'gb'; });
+    const clearFormOnly = () => {
+      $('#user-form').reset?.();
+      $('#plain_password').value = '';
+      $('#display_name').value = '';
+      $('#quota_unit').value = 'unlimited';
+      $('#quota_value').value = '';
+      $('#quota_value').disabled = true;
+      $('#expires_at').value = '';
+      $('#gen_len').value = 16;
+      resetDirty();
+    };
+    const clearFormAndMode = () => {
+      enterCreateMode();
+    };
+    $('#clear').addEventListener('click', clearFormOnly);
+    $('#clear2').addEventListener('click', clearFormOnly);
+
+    // Password field enhancements
+    $('#gen_pass').addEventListener('click', () => {
+      try {
+        const len = parseInt($('#gen_len').value, 10) || 16;
+        const pwd = randomPassword(len);
+        $('#plain_password').value = pwd;
+        $('#plain_password').focus();
+        $('#plain_password').selectionStart = $('#plain_password').selectionEnd = $('#plain_password').value.length;
+        passwordDirty = true;
+        toast('Password generated');
+      } catch { toast('Failed to generate password'); }
+    });
+    $('#toggle_pw').addEventListener('click', () => {
+      const i = $('#plain_password');
+      i.type = (i.type === 'password' ? 'text' : 'password');
+      toast(i.type === 'password' ? 'Hidden' : 'Visible');
+    });
+    (() => { $('#plain_password').setAttribute('type', 'password'); })();
+    $('#copy_pw').addEventListener('click', async () => {
+      const v = $('#plain_password').value;
+      if (!v) return;
+      try {
+        if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(v);
+        else {
+          const ta = document.createElement('textarea');
+          ta.value = v; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+        }
+        toast('Password copied');
+      } catch { toast('Copy failed'); }
+    });
+
+    // Format helpers
+    function fmtBytes(s) {
+      if (s === "-1") return "∞";
+      const n = BigInt(s);
+      const kb = 1024n, mb = kb*1024n, gb = mb*1024n, tb = gb*1024n;
+      if (n >= tb) return (Number(n) / 1099511627776).toFixed(2) + ' TB';
+      if (n >= gb) return (Number(n) / 1073741824).toFixed(2) + ' GB';
+      if (n >= mb) return (Number(n) / 1048576).toFixed(2) + ' MB';
+      if (n >= kb) return (Number(n) / 1024).toFixed(2) + ' KB';
+      return n + ' B';
+    }
+
+    function isEnabled(u) {
+      try {
+        if (u.remaining_bytes != null && String(u.remaining_bytes) !== "-1") {
+          const rb = BigInt(u.remaining_bytes);
+          if (rb <= 0n) return false;
+        }
+      } catch {}
+      if (u.remaining_days !== null && u.remaining_days !== undefined && u.remaining_days !== '') {
+        const rd = Number(u.remaining_days);
+        if (!Number.isNaN(rd) && rd <= 0) return false;
+      }
+      return true;
+    }
+
+    // Dirty flags for safe partial updates
+    let usernameDirty = false;
+    let passwordDirty = false;
+    let quotaDirty = false;
+    let expiresDirty = false;
+
+    function resetDirty() {
+      usernameDirty = false;
+      passwordDirty = false;
+      quotaDirty = false;
+      expiresDirty = false;
+    }
+
+    function enterCreateMode() {
+      $('#user-id').value = '';
+      $('#orig-username').value = '';
+      $('#username').value = '';
+      $('#plain_password').value = '';
+      $('#display_name').value = '';
+      $('#quota_unit').value = 'unlimited';
+      $('#quota_value').value = '';
+      $('#quota_value').disabled = true;
+      $('#expires_at').value = '';
+      $('#gen_len').value = 16;
+      $('#username').setAttribute('required', 'true');
+      $('#plain_password').setAttribute('required', 'true');
+      resetDirty();
+    }
+
+    function enterEditMode(u) {
+      $('#user-id').value = u.id;
+      $('#orig-username').value = u.username;
+      $('#username').value = u.username;
+      $('#display_name').value = u.name ?? '';
+      $('#plain_password').value = '';
+      $('#quota_unit').value = 'unlimited';
+      $('#quota_value').value = '';
+      $('#quota_value').disabled = true;
+      $('#expires_at').value = '';
+      $('#username').setAttribute('required', 'true');
+      $('#plain_password').removeAttribute('required');
+      resetDirty();
+    }
+
+    // Track field changes
+    $('#quota_unit').addEventListener('change', () => { quotaDirty = true; });
+    $('#quota_value').addEventListener('input', () => { quotaDirty = true; });
+    $('#expires_at').addEventListener('change', () => { expiresDirty = true; });
+    $('#username').addEventListener('input', () => {
+      const orig = $('#orig-username').value;
+      usernameDirty = ($('#user-id').value !== '' && $('#username').value !== orig);
+    });
+    $('#plain_password').addEventListener('input', () => { passwordDirty = $('#plain_password').value.length > 0; });
+
+    // Helpers to compute optional values only when needed
+    function computeQuotaBytes() {
+      const unit = $('#quota_unit').value;
+      if (unit === 'unlimited') return -1;
+      const qv = parseInt($('#quota_value').value || '0', 10);
+      if (!Number.isFinite(qv) || qv <= 0) return null;
+      return qv * 1024 * 1024 * 1024;
+    }
+    function computeExpiresAt() {
+      const expires_at_local = $('#expires_at').value;
+      if (!expires_at_local) return null;
+      const dt = new Date(expires_at_local);
+      return new Date(dt.getTime() - dt.getTimezoneOffset() * 60000).toISOString().slice(0, 19).replace('T', ' ');
+    }
+
+    // Filter UI
+    $('#filterText').addEventListener('input', (e) => {
+      filterText = (e.target.value || '').toLowerCase().trim();
+      renderTable();
+    });
+    $('#clearFilter').addEventListener('click', () => {
+      filterText = '';
+      $('#filterText').value = '';
+      renderTable();
+    });
+
+    // Sorting UI
+    thead.addEventListener('click', (e) => {
+      const th = e.target.closest('th');
+      if (!th) return;
+      if (th.getAttribute('data-sortable') === 'false') return;
+      if (!th.classList.contains('sortable')) return;
+
+      const key = th.getAttribute('data-key');
+      if (!key) return;
+
+      if (sortKey === key) {
+        sortDir = (sortDir === 'asc') ? 'desc' : 'asc';
+      } else {
+        sortKey = key;
+        // default direction by type/key
+        sortDir = (key === 'id' || key === 'used_bytes' || key === 'remaining_bytes' || key === 'remaining_days') ? 'desc' : 'asc';
+      }
+      renderTable();
+    });
+
+    function compareValues(a, b, key) {
+      // a and b are user objects with computed fields
+      switch (key) {
+        case 'id':
+          return Number(a.id) - Number(b.id);
+        case 'username':
+          return (a.username || '').toLowerCase().localeCompare((b.username || '').toLowerCase());
+        case 'name':
+          return (a.name || '').toLowerCase().localeCompare((b.name || '').toLowerCase());
+        case 'live': {
+          // true > false
+          const av = a.live === true ? 1 : 0;
+          const bv = b.live === true ? 1 : 0;
+          return av - bv;
+        }
+        case 'enabled': {
+          const av = a.enabled ? 1 : 0;
+          const bv = b.enabled ? 1 : 0;
+          return av - bv;
+        }
+        case 'used_bytes':
+          return Number(a.usedB) - Number(b.usedB);
+        case 'remaining_bytes':
+          return Number(a.remainingB) - Number(b.remainingB);
+        case 'remaining_days':
+          return Number(a.remainingDaysNum) - Number(b.remainingDaysNum);
+        default:
+          return 0;
+      }
+    }
+
+    function applySorting(list) {
+      const arr = list.slice();
+      arr.sort((a, b) => {
+        let cmp = compareValues(a, b, sortKey);
+        if (sortDir === 'desc') cmp = -cmp;
+        return cmp;
+      });
+      return arr;
+    }
+
+    function applyFilter(list) {
+      if (!filterText) return list;
+      return list.filter(u => {
+        const un = (u.username || '').toLowerCase();
+        const dn = (u.name || '').toLowerCase();
+        return un.includes(filterText) || dn.includes(filterText);
+      });
+    }
+
+    function updateSortIndicators() {
+      document.querySelectorAll('#users-table thead th').forEach(th => {
+        th.classList.remove('sorted');
+        const span = th.querySelector('.sort-indicator');
+        if (span) span.textContent = '';
+      });
+      const active = document.querySelector(`#users-table thead th[data-key="${sortKey}"]`);
+      if (active) {
+        active.classList.add('sorted');
+        const span = active.querySelector('.sort-indicator');
+        if (span) span.textContent = sortDir === 'asc' ? '▲' : '▼';
+      }
+    }
+
+    async function loadUsers() {
+      try {
+        const res = await fetch('/api/users');
+        if (!res.ok) throw new Error('HTTP '+res.status);
+        const list = await res.json();
+
+        const nextPrev = new Map();
+        currentUsers = list.map(u => {
+          const id = u.id;
+          const usedB = BigInt(u.used_bytes || 0);
+          const hadPrev = prevUsage.has(id);
+          const prev = prevUsage.get(id);
+          let live = null; // null = detecting, true = live, false = idle
+          if (hadPrev) {
+            const delta = usedB - prev;
+            if (delta >= 0n) live = delta >= LIVE_THRESHOLD;
+            else live = null;
+          }
+          nextPrev.set(id, usedB);
+          const enabled = isEnabled(u);
+          const remainingB = BigInt(u.remaining_bytes ?? -1);
+          const remainingDaysNum = (u.remaining_days === '' || u.remaining_days == null) ? Number.POSITIVE_INFINITY : Number(u.remaining_days);
+          return {
+            ...u,
+            usedB, remainingB, remainingDaysNum,
+            enabled, live
+          };
+        });
+
+        // Replace prevUsage snapshot
+        prevUsage = nextPrev;
+
+        renderTable();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderTable() {
+      // Filter + sort
+      let view = applyFilter(currentUsers);
+      view = applySorting(view);
+      updateSortIndicators();
+
+      // Render
+      tbody.innerHTML = '';
+      for (const u of view) {
+        const liveBadge =
+          u.live === true
+            ? `<span class="badge badge-success" title="Traffic increased ≥ 300 B in the last interval"><span class="dot live"></span>Online</span>`
+            : u.live === false
+              ? `<span class="badge badge-muted" title="No meaningful traffic in the last interval"><span class="dot idle"></span>Idle</span>`
+              : `<span class="badge badge-muted" title="Collecting baseline to detect activity">Detecting…</span>`;
+
+        const enabledBadge = u.enabled
+          ? `<span class="badge badge-success" title="User is enabled (not expired and quota available)"><span class="dot enabled"></span>Enabled</span>`
+          : `<span class="badge badge-danger" title="User is disabled (expired or quota reached)"><span class="dot disabled"></span>Disabled</span>`;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="nowrap">${u.id}</td>
+          <td>${liveBadge}</td>
+          <td>${enabledBadge}</td>
+          <td><div class="mono">${u.username}</div></td>
+          <td><div class="subtle">${u.name ?? ''}</div></td>
+          <td>${fmtBytes(u.used_bytes)}</td>
+          <td>${fmtBytes(u.remaining_bytes)}</td>
+          <td>${u.remaining_days ?? ''}</td>
+          <td>
+            <div class="url-box">
+              ${u.trojan_url
+                ? `<code class="url-code mono">${u.trojan_url}</code>
+                   <button class="btn btn-ghost btn-sm" data-action="copy-url" title="Copy trojan URL" data-id="${u.id}">⧉</button>`
+                : '<span class="subtle">No password stored</span>'}
+            </div>
+          </td>
+          <td>
+            <div class="table-actions">
+              <button class="btn btn-sm" data-action="edit" data-id="${u.id}" title="Edit">Edit</button>
+              <button class="btn btn-sm" data-action="reset" data-id="${u.id}" title="Reset traffic">Reset</button>
+              <button class="btn btn-danger btn-sm" data-action="delete" data-id="${u.id}" title="Delete user">Delete</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    // Table action handlers
+    tbody.addEventListener('click', async (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      const id = btn.getAttribute('data-id');
+      const action = btn.getAttribute('data-action');
+
+      if (action === 'copy-url') {
+        const code = btn.parentElement.querySelector('.url-code');
+        if (!code) return;
+        const url = code.textContent.trim();
+        try {
+          if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(url);
+          else {
+            const ta = document.createElement('textarea');
+            ta.value = url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+          }
+          toast('URL copied');
+        } catch { toast('Copy failed'); }
+        return;
+      }
+
+      if (action === 'edit') {
+        const u = currentUsers.find(x => String(x.id) === String(id));
+        if (!u) return;
+        enterEditMode(u);
+        setPanelOpen(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        toast('Editing user #' + id);
+      }
+
+      if (action === 'reset') {
+        if (!confirm('Reset traffic counters?')) return;
+        const res = await fetch(`/api/users/${id}/reset-traffic`, { method: 'POST' });
+        if (res.ok) { toast('Traffic reset'); await loadUsers(); }
+        else toast('Reset failed');
+      }
+
+      if (action === 'delete') {
+        if (!confirm('Delete this user?')) return;
+        const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
+        if (res.ok) { toast('User deleted'); await loadUsers(); }
+        else toast('Delete failed');
+      }
+    });
+
+    // Form submit
+    $('#user-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = $('#user-id').value;
+      const isCreate = !id;
+
+      const username = $('#username').value.trim();
+      const plain_password = $('#plain_password').value;
+      const display_name = $('#display_name').value.trim();
+
+      try {
+        if (isCreate) {
+          if (!username) { toast('Username is required'); return; }
+          if (!plain_password) { toast('Password is required'); return; }
+
+          const payload = { username, plain_password };
+          if (display_name) payload.display_name = display_name;
+
+          const qb = computeQuotaBytes();
+          if (qb !== null) payload.quota_bytes = qb;
+
+          const ea = computeExpiresAt();
+          if (ea) payload.expires_at = ea;
+
+          const res = await fetch('/api/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error('Create failed');
+          toast('User created');
+          enterCreateMode();
+          await loadUsers();
+          return;
+        }
+
+        // Partial update
+        const payload = {};
+        payload.display_name = display_name; // allow changing display name alone
+
+        if (usernameDirty && username) payload.username = username;
+        if (passwordDirty && plain_password) payload.plain_password = plain_password;
+        if (quotaDirty) {
+          const qb = computeQuotaBytes();
+          if (qb !== null) payload.quota_bytes = qb;
+        }
+        if (expiresDirty) {
+          payload.expires_at = computeExpiresAt();
+        }
+
+        const res = await fetch(`/api/users/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('Update failed');
+
+        toast('User updated');
+        resetDirty();
+        await loadUsers();
+      } catch (err) {
+        console.error(err);
+        toast(err.message || 'Save failed');
+      }
+    });
+
+    // Initial load + polling
+    loadUsers();
+    setInterval(loadUsers, 5000);
+  </script>
+</body>
+</html>

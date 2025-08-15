@@ -111,6 +111,12 @@
     .collapsible.open .card-body { display: block; }
     .collapsible.open .chev { transform: rotate(90deg); }
 
+    /* Create/Edit visual modes */
+    #user-panel.mode-create { border-left: 3px solid var(--primary); }
+    #user-panel.mode-edit   { border-left: 3px solid var(--warning); }
+    #user-panel.mode-create .card-header { border-bottom-color: rgba(59,130,246,0.35); }
+    #user-panel.mode-edit .card-header   { border-bottom-color: rgba(251,191,36,0.35); }
+
     .fields {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -195,8 +201,11 @@
       background: rgba(255,255,255,0.02);
     }
     .badge-success { border-color: rgba(34,197,94,0.35); background: rgba(34,197,94,0.12); color: #bbf7d0; }
-    .badge-danger { border-color: rgba(239,68,68,0.35); background: rgba(239,68,68,0.12); color: #fecaca; }
-    .badge-muted  { border-color: rgba(148,163,184,0.35); background: rgba(148,163,184,0.10); color: #cbd5e1; }
+    .badge-danger  { border-color: rgba(239,68,68,0.35); background: rgba(239,68,68,0.12); color: #fecaca; }
+    .badge-muted   { border-color: rgba(148,163,184,0.35); background: rgba(148,163,184,0.10); color: #cbd5e1; }
+    .badge-primary { border-color: rgba(59,130,246,0.40); background: rgba(59,130,246,0.18); color: #cfe1ff; }
+    .badge-warning { border-color: rgba(251,191,36,0.40); background: rgba(251,191,36,0.16); color: #fde68a; }
+
     .dot {
       width: 8px; height: 8px; border-radius: 50%;
       box-shadow: 0 0 0 3px rgba(255,255,255,0.02) inset;
@@ -239,7 +248,7 @@
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
 
     .url-box {
-      display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start;
+      display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: start;
       max-width: 560px;
     }
     .url-code {
@@ -253,8 +262,8 @@
       font-size: 12px;
       color: #dce6ff;
       line-height: 1.25;
-      max-height: calc(1.25em * 3); /* show up to 3 lines */
-      overflow: auto; /* scroll if longer */
+      max-height: calc(1.25em * 3);
+      overflow: auto;
     }
 
     .toast {
@@ -271,15 +280,30 @@
       z-index: 9999;
       font-size: 13px;
     }
-    @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: translateY(0) } }
 
     /* Filter bar */
-    .filter-bar {
-      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    .filter-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .filter-input { min-width: 220px; }
+
+    /* QR modal */
+    .qr-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      display: grid; place-items: center; z-index: 10000;
+      animation: fadeIn .15s ease-out;
     }
-    .filter-input {
-      min-width: 220px;
+    .qr-modal {
+      background: #0e1726; border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px; width: 360px; max-width: calc(100% - 32px);
+      box-shadow: var(--shadow);
     }
+    .qr-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .qr-title { font-weight: 700; }
+    .qr-close { border: 1px solid var(--border); background: transparent; color: var(--text); border-radius: 8px; padding: 4px 8px; cursor: pointer; }
+    .qr-canvas { display: grid; place-items: center; background: #fff; padding: 10px; border-radius: 8px; }
+    .qr-url { margin-top: 10px; font-size: 12px; color: #cbd5e1; word-break: break-all; max-height: 6em; overflow: auto; }
+    .qr-actions { display:flex; gap:8px; margin-top:10px; justify-content:flex-end; }
+    @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
   </style>
 </head>
 <body>
@@ -303,12 +327,14 @@
       </div>
     </header>
 
-    <!-- Top: Collapsible Add/Edit Panel (collapsed by default) -->
-    <div class="card collapsible" id="user-panel">
+    <!-- Top: Collapsible Add/Edit Panel -->
+    <div class="card collapsible mode-create" id="user-panel">
       <div class="card-header toggle" id="user-panel-toggle" aria-expanded="false">
         <div class="inline">
           <span class="chev">▶</span>
-          <strong>Add / Edit User</strong>
+          <strong id="panel-title">Create User</strong>
+          <span id="panel-mode" class="badge badge-primary">Create</span>
+          <span id="panel-edit-id" class="subtle" style="display:none;">#<span id="panel-edit-id-val"></span></span>
         </div>
         <div class="inline">
           <button type="button" id="new-user" class="btn btn-primary btn-sm" title="Create a new user">New User</button>
@@ -369,15 +395,16 @@
             </div>
 
             <div>
-              <label for="expires_at">Expiry Date (UTC) (optional)</label>
+              <label for="expires_at">Expiry Date (Tehran UTC+3:30) (optional)</label>
               <div class="field">
-                <input id="expires_at" type="datetime-local">
+                <input id="expires_at" type="datetime-local" placeholder="YYYY-MM-DDTHH:MM">
               </div>
+              <div id="expiry-debug" class="subtle" style="margin-top:4px; display:none;"></div>
             </div>
           </div>
 
           <div class="row-actions">
-            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">Create User</button>
             <button type="button" id="clear2" class="btn btn-ghost">Reset Form</button>
           </div>
         </form>
@@ -424,14 +451,19 @@
     const tbody = $('#users-table tbody');
     const thead = $('#users-table thead');
 
-    // Collapsible panel controls
+    // Collapsible / panel controls
     const panel = $('#user-panel');
     const panelToggle = $('#user-panel-toggle');
+    const panelTitle = $('#panel-title');
+    const panelMode = $('#panel-mode');
+    const panelEditId = $('#panel-edit-id');
+    const panelEditIdVal = $('#panel-edit-id-val');
+    const submitBtn = $('#submitBtn');
+
     function setPanelOpen(open) {
       panel.classList.toggle('open', open);
       panelToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     }
-    // Collapsed by default
     setPanelOpen(false);
     panelToggle?.addEventListener('click', (e) => {
       if (e.target.closest('button')) return;
@@ -453,21 +485,19 @@
       setTimeout(() => el.remove(), 2600);
     }
 
-    // Keep the last used_bytes per user to detect "live" activity
-    let prevUsage = new Map(); // id -> BigInt(used_bytes)
-    const LIVE_THRESHOLD = 300n; // bytes per refresh interval
+    // Visible-rows usage tracking (for Live badge)
+    let visibleUsage = new Map(); // id -> BigInt(used_bytes)
+    const LIVE_THRESHOLD = 300n;
 
-    // Sorting state
+    // Sort/Filter state
     let sortKey = 'id';
-    let sortDir = 'asc'; // 'asc' | 'desc'
-
-    // Filter state
+    let sortDir = 'asc';
     let filterText = '';
 
-    // Cache of last fetched users + computed fields
-    let currentUsers = []; // array of { ...u, enabled, live, usedB, remainingB, remainingDaysNum }
+    // Users cache
+    let currentUsers = new Map();
 
-    // Secure random helpers for password generation
+    // Password helpers
     function getRandomInt(maxExclusive) {
       const max = Math.floor(maxExclusive);
       if (max <= 0) return 0;
@@ -498,27 +528,6 @@
       shuffleArraySecure(chars);
       return chars.join('');
     }
-
-    // Form helpers
-    $('#quota_unit').addEventListener('change', (e) => { $('#quota_value').disabled = e.target.value !== 'gb'; });
-    const clearFormOnly = () => {
-      $('#user-form').reset?.();
-      $('#plain_password').value = '';
-      $('#display_name').value = '';
-      $('#quota_unit').value = 'unlimited';
-      $('#quota_value').value = '';
-      $('#quota_value').disabled = true;
-      $('#expires_at').value = '';
-      $('#gen_len').value = 16;
-      resetDirty();
-    };
-    const clearFormAndMode = () => {
-      enterCreateMode();
-    };
-    $('#clear').addEventListener('click', clearFormOnly);
-    $('#clear2').addEventListener('click', clearFormOnly);
-
-    // Password field enhancements
     $('#gen_pass').addEventListener('click', () => {
       try {
         const len = parseInt($('#gen_len').value, 10) || 16;
@@ -549,7 +558,7 @@
       } catch { toast('Copy failed'); }
     });
 
-    // Format helpers
+    // Formatting helpers
     function fmtBytes(s) {
       if (s === "-1") return "∞";
       const n = BigInt(s);
@@ -562,6 +571,7 @@
     }
 
     function isEnabled(u) {
+      // Fallback if backend doesn't send enabled
       try {
         if (u.remaining_bytes != null && String(u.remaining_bytes) !== "-1") {
           const rb = BigInt(u.remaining_bytes);
@@ -575,7 +585,68 @@
       return true;
     }
 
-    // Dirty flags for safe partial updates
+    // Tehran timezone conversions (fixed UTC+3:30)
+    const TEHRAN_OFFSET_MIN = 210; // 3*60 + 30
+
+    // Convert UTC "YYYY-MM-DD HH:mm[:ss]" or ISO to input "YYYY-MM-DDTHH:MM" in Tehran time
+    function utcSqlToTehranInput(utcStr) {
+      try {
+        if (!utcStr) return '';
+        let s = String(utcStr).trim();
+        if (!s) return '';
+        if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}(:\d{2})?$/.test(s)) {
+          s = s.replace(' ', 'T') + 'Z';
+        } else if (/^\d{4}-\d{2}-\d{2}T/.test(s) && !/[zZ]|[+\-]\d{2}:\d{2}$/.test(s)) {
+          s += 'Z';
+        }
+        const dUtc = new Date(s);
+        if (isNaN(dUtc.getTime())) return '';
+        const msTehran = dUtc.getTime() + TEHRAN_OFFSET_MIN * 60000;
+        const t = new Date(msTehran);
+        const pad = n => String(n).padStart(2, '0');
+        const y = t.getUTCFullYear();
+        const m = pad(t.getUTCMonth() + 1);
+        const d = pad(t.getUTCDate());
+        const hh = pad(t.getUTCHours());
+        const mm = pad(t.getUTCMinutes());
+        return `${y}-${m}-${d}T${hh}:${mm}`;
+      } catch {
+        return '';
+      }
+    }
+
+    // Convert input "YYYY-MM-DDTHH:MM" (Tehran) to UTC "YYYY-MM-DD HH:mm:ss"
+    function tehranInputToUtcSql(input) {
+      try {
+        if (!input) return null;
+        const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(String(input).trim());
+        if (!m) return null;
+        const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]), hh = Number(m[4]), mm = Number(m[5]);
+        const ms = Date.UTC(y, mo - 1, d, hh, mm) - TEHRAN_OFFSET_MIN * 60000;
+        const t = new Date(ms);
+        if (isNaN(t.getTime())) return null;
+        const pad = n => String(n).padStart(2, '0');
+        const Y = t.getUTCFullYear();
+        const M = pad(t.getUTCMonth() + 1);
+        const D = pad(t.getUTCDate());
+        const H = pad(t.getUTCHours());
+        const Mi = pad(t.getUTCMinutes());
+        const S = pad(t.getUTCSeconds());
+        return `${Y}-${M}-${D} ${H}:${Mi}:${S}`;
+      } catch {
+        return null;
+      }
+    }
+
+    function showExpiryDebug(raw, localStr) {
+      const el = $('#expiry-debug');
+      if (!el) return;
+      el.style.display = 'block';
+      el.textContent = `Expiry (UTC raw): ${raw || '(none)'} → Tehran input: ${localStr || '(empty)'}`;
+      console.debug('[TGUI] Expiry debug:', { raw, tehranInput: localStr });
+    }
+
+    // Dirty flags
     let usernameDirty = false;
     let passwordDirty = false;
     let quotaDirty = false;
@@ -588,7 +659,33 @@
       expiresDirty = false;
     }
 
+    // Form helpers
+    $('#quota_unit').addEventListener('change', (e) => { $('#quota_value').disabled = e.target.value !== 'gb'; });
+    const clearFormOnly = () => {
+      $('#user-form').reset?.();
+      $('#plain_password').value = '';
+      $('#display_name').value = '';
+      $('#quota_unit').value = 'unlimited';
+      $('#quota_value').value = '';
+      $('#quota_value').disabled = true;
+      $('#expires_at').value = '';
+      $('#gen_len').value = 16;
+      $('#expiry-debug').style.display = 'none';
+      resetDirty();
+    };
+    $('#clear').addEventListener('click', clearFormOnly);
+    $('#clear2').addEventListener('click', clearFormOnly);
+
     function enterCreateMode() {
+      panel.classList.add('mode-create');
+      panel.classList.remove('mode-edit');
+      panelTitle.textContent = 'Create User';
+      panelMode.textContent = 'Create';
+      panelMode.classList.add('badge-primary');
+      panelMode.classList.remove('badge-warning');
+      panelEditId.style.display = 'none';
+      submitBtn.textContent = 'Create User';
+
       $('#user-id').value = '';
       $('#orig-username').value = '';
       $('#username').value = '';
@@ -599,12 +696,23 @@
       $('#quota_value').disabled = true;
       $('#expires_at').value = '';
       $('#gen_len').value = 16;
+      $('#expiry-debug').style.display = 'none';
       $('#username').setAttribute('required', 'true');
       $('#plain_password').setAttribute('required', 'true');
       resetDirty();
     }
 
-    function enterEditMode(u) {
+    async function enterEditMode(u) {
+      panel.classList.remove('mode-create');
+      panel.classList.add('mode-edit');
+      panelTitle.textContent = 'Edit User';
+      panelMode.textContent = 'Edit';
+      panelMode.classList.remove('badge-primary');
+      panelMode.classList.add('badge-warning');
+      panelEditId.style.display = '';
+      panelEditIdVal.textContent = u.id;
+      submitBtn.textContent = 'Update User';
+
       $('#user-id').value = u.id;
       $('#orig-username').value = u.username;
       $('#username').value = u.username;
@@ -614,9 +722,17 @@
       $('#quota_value').value = '';
       $('#quota_value').disabled = true;
       $('#expires_at').value = '';
+      $('#expiry-debug').style.display = 'none';
       $('#username').setAttribute('required', 'true');
       $('#plain_password').removeAttribute('required');
       resetDirty();
+
+      const rawUtc = u.expires_at || u.expiresAt || null;
+      if (rawUtc) {
+        const tehranInput = utcSqlToTehranInput(rawUtc);
+        $('#expires_at').value = tehranInput || '';
+        showExpiryDebug(rawUtc, tehranInput);
+      }
     }
 
     // Track field changes
@@ -629,7 +745,6 @@
     });
     $('#plain_password').addEventListener('input', () => { passwordDirty = $('#plain_password').value.length > 0; });
 
-    // Helpers to compute optional values only when needed
     function computeQuotaBytes() {
       const unit = $('#quota_unit').value;
       if (unit === 'unlimited') return -1;
@@ -638,10 +753,9 @@
       return qv * 1024 * 1024 * 1024;
     }
     function computeExpiresAt() {
-      const expires_at_local = $('#expires_at').value;
-      if (!expires_at_local) return null;
-      const dt = new Date(expires_at_local);
-      return new Date(dt.getTime() - dt.getTimezoneOffset() * 60000).toISOString().slice(0, 19).replace('T', ' ');
+      const tehranInput = $('#expires_at').value;
+      const utcSql = tehranInputToUtcSql(tehranInput);
+      return utcSql;
     }
 
     // Filter UI
@@ -669,43 +783,24 @@
         sortDir = (sortDir === 'asc') ? 'desc' : 'asc';
       } else {
         sortKey = key;
-        // default direction by type/key
         sortDir = (key === 'id' || key === 'used_bytes' || key === 'remaining_bytes' || key === 'remaining_days') ? 'desc' : 'asc';
       }
       renderTable();
     });
 
     function compareValues(a, b, key) {
-      // a and b are user objects with computed fields
       switch (key) {
-        case 'id':
-          return Number(a.id) - Number(b.id);
-        case 'username':
-          return (a.username || '').toLowerCase().localeCompare((b.username || '').toLowerCase());
-        case 'name':
-          return (a.name || '').toLowerCase().localeCompare((b.name || '').toLowerCase());
-        case 'live': {
-          // true > false
-          const av = a.live === true ? 1 : 0;
-          const bv = b.live === true ? 1 : 0;
-          return av - bv;
-        }
-        case 'enabled': {
-          const av = a.enabled ? 1 : 0;
-          const bv = b.enabled ? 1 : 0;
-          return av - bv;
-        }
-        case 'used_bytes':
-          return Number(a.usedB) - Number(b.usedB);
-        case 'remaining_bytes':
-          return Number(a.remainingB) - Number(b.remainingB);
-        case 'remaining_days':
-          return Number(a.remainingDaysNum) - Number(b.remainingDaysNum);
-        default:
-          return 0;
+        case 'id': return Number(a.id) - Number(b.id);
+        case 'username': return (a.username || '').toLowerCase().localeCompare((b.username || '').toLowerCase());
+        case 'name': return (a.name || '').toLowerCase().localeCompare((b.name || '').toLowerCase());
+        case 'live': return (a.live === true ? 1 : 0) - (b.live === true ? 1 : 0);
+        case 'enabled': return (a.enabled ? 1 : 0) - (b.enabled ? 1 : 0);
+        case 'used_bytes': return Number(a.usedB) - Number(b.usedB);
+        case 'remaining_bytes': return Number(a.remainingB) - Number(b.remainingB);
+        case 'remaining_days': return Number(a.remainingDaysNum) - Number(b.remainingDaysNum);
+        default: return 0;
       }
     }
-
     function applySorting(list) {
       const arr = list.slice();
       arr.sort((a, b) => {
@@ -715,7 +810,6 @@
       });
       return arr;
     }
-
     function applyFilter(list) {
       if (!filterText) return list;
       return list.filter(u => {
@@ -724,7 +818,6 @@
         return un.includes(filterText) || dn.includes(filterText);
       });
     }
-
     function updateSortIndicators() {
       document.querySelectorAll('#users-table thead th').forEach(th => {
         th.classList.remove('sorted');
@@ -745,31 +838,20 @@
         if (!res.ok) throw new Error('HTTP '+res.status);
         const list = await res.json();
 
-        const nextPrev = new Map();
-        currentUsers = list.map(u => {
-          const id = u.id;
+        const next = new Map();
+        for (const u of list) {
           const usedB = BigInt(u.used_bytes || 0);
-          const hadPrev = prevUsage.has(id);
-          const prev = prevUsage.get(id);
-          let live = null; // null = detecting, true = live, false = idle
-          if (hadPrev) {
-            const delta = usedB - prev;
-            if (delta >= 0n) live = delta >= LIVE_THRESHOLD;
-            else live = null;
-          }
-          nextPrev.set(id, usedB);
-          const enabled = isEnabled(u);
           const remainingB = BigInt(u.remaining_bytes ?? -1);
-          const remainingDaysNum = (u.remaining_days === '' || u.remaining_days == null) ? Number.POSITIVE_INFINITY : Number(u.remaining_days);
-          return {
+          const remainingDaysNum = (u.remaining_days === '' || u.remaining_days == null)
+            ? Number.POSITIVE_INFINITY
+            : Number(u.remaining_days);
+          next.set(String(u.id), {
             ...u,
             usedB, remainingB, remainingDaysNum,
-            enabled, live
-          };
-        });
-
-        // Replace prevUsage snapshot
-        prevUsage = nextPrev;
+            enabled: (typeof u.enabled === 'boolean') ? u.enabled : isEnabled(u)
+          });
+        }
+        currentUsers = next;
 
         renderTable();
       } catch (e) {
@@ -778,13 +860,24 @@
     }
 
     function renderTable() {
-      // Filter + sort
-      let view = applyFilter(currentUsers);
-      view = applySorting(view);
+      const list = Array.from(currentUsers.values());
+      let view = applyFilter(list);
+
+      const computed = view.map(u => {
+        const id = String(u.id);
+        let live = null;
+        if (visibleUsage.has(id)) {
+          const prev = visibleUsage.get(id);
+          const delta = u.usedB - prev;
+          live = (delta >= 0n) ? (delta >= LIVE_THRESHOLD) : null;
+        }
+        return { ...u, live };
+      });
+
+      view = applySorting(computed);
       updateSortIndicators();
 
-      // Render
-      tbody.innerHTML = '';
+      const frag = document.createDocumentFragment();
       for (const u of view) {
         const liveBadge =
           u.live === true
@@ -796,6 +889,10 @@
         const enabledBadge = u.enabled
           ? `<span class="badge badge-success" title="User is enabled (not expired and quota available)"><span class="dot enabled"></span>Enabled</span>`
           : `<span class="badge badge-danger" title="User is disabled (expired or quota reached)"><span class="dot disabled"></span>Disabled</span>`;
+
+        const toggleBtn = u.enabled
+          ? `<button class="btn btn-sm" data-action="disable" data-id="${u.id}" title="Disable this user">Disable</button>`
+          : `<button class="btn btn-sm" data-action="enable" data-id="${u.id}" title="Enable this user">Enable</button>`;
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -811,33 +908,87 @@
             <div class="url-box">
               ${u.trojan_url
                 ? `<code class="url-code mono">${u.trojan_url}</code>
-                   <button class="btn btn-ghost btn-sm" data-action="copy-url" title="Copy trojan URL" data-id="${u.id}">⧉</button>`
+                   <button class="btn btn-ghost btn-sm" data-action="copy-url" title="Copy trojan URL" data-id="${u.id}">⧉</button>
+                   <button class="btn btn-ghost btn-sm" data-action="qr-url" title="Show QR code" data-id="${u.id}">QR</button>`
                 : '<span class="subtle">No password stored</span>'}
             </div>
           </td>
           <td>
             <div class="table-actions">
               <button class="btn btn-sm" data-action="edit" data-id="${u.id}" title="Edit">Edit</button>
+              ${toggleBtn}
               <button class="btn btn-sm" data-action="reset" data-id="${u.id}" title="Reset traffic">Reset</button>
               <button class="btn btn-danger btn-sm" data-action="delete" data-id="${u.id}" title="Delete user">Delete</button>
             </div>
           </td>
         `;
-        tbody.appendChild(tr);
+        frag.appendChild(tr);
       }
+      tbody.innerHTML = '';
+      tbody.appendChild(frag);
+
+      const nextVisible = new Map();
+      for (const u of view) {
+        nextVisible.set(String(u.id), u.usedB);
+      }
+      visibleUsage = nextVisible;
     }
 
-    // Table action handlers
-    tbody.addEventListener('click', async (e) => {
-      const btn = e.target.closest('button');
-      if (!btn) return;
-      const id = btn.getAttribute('data-id');
-      const action = btn.getAttribute('data-action');
+    // Load QRCode library on-demand from CDN
+    async function ensureQRCodeLoaded() {
+      if (window.QRCode) return true;
+      return new Promise(resolve => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+        s.referrerPolicy = 'no-referrer';
+        s.onload = () => resolve(true);
+        s.onerror = () => resolve(false);
+        document.head.appendChild(s);
+      });
+    }
 
-      if (action === 'copy-url') {
-        const code = btn.parentElement.querySelector('.url-code');
-        if (!code) return;
-        const url = code.textContent.trim();
+    async function openQrModal(url, title) {
+      if (!url) { toast('No URL to show'); return; }
+      const ok = await ensureQRCodeLoaded();
+      if (!ok || !window.QRCode) {
+        toast('QR library failed to load');
+        return;
+      }
+
+      const backdrop = document.createElement('div');
+      backdrop.className = 'qr-backdrop';
+      backdrop.addEventListener('click', (e) => { if (e.target === backdrop) document.body.removeChild(backdrop); });
+
+      const modal = document.createElement('div');
+      modal.className = 'qr-modal';
+
+      const header = document.createElement('div');
+      header.className = 'qr-header';
+      const hTitle = document.createElement('div');
+      hTitle.className = 'qr-title';
+      hTitle.textContent = title || 'trojan://';
+      const closeBtn = document.createElement('button');
+      closeBtn.className = 'qr-close';
+      closeBtn.textContent = 'Close';
+      closeBtn.addEventListener('click', () => document.body.removeChild(backdrop));
+      header.appendChild(hTitle);
+      header.appendChild(closeBtn);
+
+      const canvasWrap = document.createElement('div');
+      canvasWrap.className = 'qr-canvas';
+      canvasWrap.style.width = '260px';
+      canvasWrap.style.height = '260px';
+
+      const urlText = document.createElement('div');
+      urlText.className = 'qr-url mono';
+      urlText.textContent = url;
+
+      const actions = document.createElement('div');
+      actions.className = 'qr-actions';
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'btn btn-sm';
+      copyBtn.textContent = 'Copy URL';
+      copyBtn.addEventListener('click', async () => {
         try {
           if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(url);
           else {
@@ -846,30 +997,114 @@
           }
           toast('URL copied');
         } catch { toast('Copy failed'); }
-        return;
-      }
+      });
+      const saveBtn = document.createElement('button');
+      saveBtn.className = 'btn btn-sm';
+      saveBtn.textContent = 'Save PNG';
+      saveBtn.addEventListener('click', () => {
+        const canvas = canvasWrap.querySelector('canvas');
+        if (!canvas) return;
+        const a = document.createElement('a');
+        a.href = canvas.toDataURL('image/png');
+        a.download = (title || 'trojan') + '.png';
+        a.click();
+      });
+      actions.appendChild(copyBtn);
+      actions.appendChild(saveBtn);
 
-      if (action === 'edit') {
-        const u = currentUsers.find(x => String(x.id) === String(id));
-        if (!u) return;
-        enterEditMode(u);
-        setPanelOpen(true);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        toast('Editing user #' + id);
-      }
+      modal.appendChild(header);
+      modal.appendChild(canvasWrap);
+      modal.appendChild(urlText);
+      modal.appendChild(actions);
+      backdrop.appendChild(modal);
+      document.body.appendChild(backdrop);
 
-      if (action === 'reset') {
-        if (!confirm('Reset traffic counters?')) return;
-        const res = await fetch(`/api/users/${id}/reset-traffic`, { method: 'POST' });
-        if (res.ok) { toast('Traffic reset'); await loadUsers(); }
-        else toast('Reset failed');
+      try {
+        const q = new QRCode(canvasWrap, { width: 240, height: 240, colorDark: '#000000', colorLight: '#ffffff' });
+        q.makeCode(url);
+      } catch (e) {
+        console.error(e);
+        toast('Failed to render QR');
       }
+    }
 
-      if (action === 'delete') {
-        if (!confirm('Delete this user?')) return;
-        const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
-        if (res.ok) { toast('User deleted'); await loadUsers(); }
-        else toast('Delete failed');
+    // Table actions
+    tbody.addEventListener('click', async (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      const id = btn.getAttribute('data-id');
+      const action = btn.getAttribute('data-action');
+
+      try {
+        if (action === 'copy-url') {
+          const u = currentUsers.get(String(id));
+          const url = u?.trojan_url || btn.parentElement.querySelector('.url-code')?.textContent?.trim();
+          if (!url) return;
+          try {
+            if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(url);
+            else {
+              const ta = document.createElement('textarea');
+              ta.value = url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+            }
+            toast('URL copied');
+          } catch { toast('Copy failed'); }
+          return;
+        }
+
+        if (action === 'qr-url') {
+          const u = currentUsers.get(String(id));
+          const url = u?.trojan_url;
+          await openQrModal(url, u?.name || u?.username || 'trojan');
+          return;
+        }
+
+        if (action === 'enable') {
+          const resp = await fetch(`/api/users/${id}/enable`, { method: 'POST' });
+          if (!resp.ok) {
+            const data = await resp.json().catch(() => ({}));
+            toast(data.message || 'Enable failed');
+          } else {
+            toast('User enabled');
+            await loadUsers();
+          }
+          return;
+        }
+
+        if (action === 'disable') {
+          const resp = await fetch(`/api/users/${id}/disable`, { method: 'POST' });
+          if (!resp.ok) toast('Disable failed');
+          else { toast('User disabled'); await loadUsers(); }
+          return;
+        }
+
+        if (action === 'edit') {
+          const u = currentUsers.get(String(id));
+          if (!u) return;
+          await enterEditMode(u);
+          setPanelOpen(true);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          toast('Editing user #' + id);
+          return;
+        }
+
+        if (action === 'reset') {
+          if (!confirm('Reset traffic counters?')) return;
+          const res = await fetch(`/api/users/${id}/reset-traffic`, { method: 'POST' });
+          if (res.ok) { toast('Traffic reset'); await loadUsers(); }
+          else toast('Reset failed');
+          return;
+        }
+
+        if (action === 'delete') {
+          if (!confirm('Delete this user?')) return;
+          const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
+          if (res.ok) { toast('User deleted'); await loadUsers(); }
+          else toast('Delete failed');
+          return;
+        }
+      } catch (err) {
+        console.error(err);
+        toast('Action failed');
       }
     });
 
@@ -894,8 +1129,8 @@
           const qb = computeQuotaBytes();
           if (qb !== null) payload.quota_bytes = qb;
 
-          const ea = computeExpiresAt();
-          if (ea) payload.expires_at = ea;
+          const utcSql = computeExpiresAt();
+          if (utcSql) payload.expires_at = utcSql;
 
           const res = await fetch('/api/users', {
             method: 'POST',
@@ -911,7 +1146,7 @@
 
         // Partial update
         const payload = {};
-        payload.display_name = display_name; // allow changing display name alone
+        payload.display_name = display_name;
 
         if (usernameDirty && username) payload.username = username;
         if (passwordDirty && plain_password) payload.plain_password = plain_password;
@@ -919,9 +1154,16 @@
           const qb = computeQuotaBytes();
           if (qb !== null) payload.quota_bytes = qb;
         }
+        let extendedToFuture = false;
         if (expiresDirty) {
-          payload.expires_at = computeExpiresAt();
+          const utcSql = computeExpiresAt();
+          payload.expires_at = utcSql;
+          if (utcSql) {
+            extendedToFuture = (new Date(utcSql + 'Z').getTime() > Date.now());
+          }
         }
+
+        const wasDisabled = !currentUsers.get(String(id))?.enabled;
 
         const res = await fetch(`/api/users/${id}`, {
           method: 'PUT',
@@ -929,6 +1171,10 @@
           body: JSON.stringify(payload)
         });
         if (!res.ok) throw new Error('Update failed');
+
+        if (wasDisabled && extendedToFuture) {
+          try { await fetch(`/api/users/${id}/enable`, { method: 'POST' }); } catch {}
+        }
 
         toast('User updated');
         resetDirty();
@@ -939,7 +1185,7 @@
       }
     });
 
-    // Initial load + polling
+    enterCreateMode();
     loadUsers();
     setInterval(loadUsers, 5000);
   </script>

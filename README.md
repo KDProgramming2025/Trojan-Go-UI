@@ -1,7 +1,7 @@
 # Trojan-Go-UI
 A frontend UI for the https://github.com/p4gefau1t/trojan-go
 
-The API must be enabled in the Trojan-Go config.
+The API must be enabled in the Trojan-Go config.\
 Also the SQL must be enabled in the Trojan-Go config.
 
 Note: It doesn't have login mechanism, you'll have to add that through the Apache directory password or some other ways.
@@ -40,7 +40,7 @@ Example `config.json`:
   }
 }
 ```
-In this config the `trojan_api` will be running on port 10001
+In this config the `trojan_api` will be running on port 10001\
 The `listen` block is for nodejs 
 
 This config is assuming you have trojan-go running on port 10000 and have such config for the apache webserver:

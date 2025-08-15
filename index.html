@@ -42,123 +42,39 @@
       line-height: 1.45;
     }
 
-    .container {
-      max-width: 1200px;
-      margin: 28px auto 48px;
-      padding: 0 18px;
-    }
+    .container { max-width: 1200px; margin: 28px auto 48px; padding: 0 18px; }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      gap: 16px;
-      margin-bottom: 16px;
-    }
+    header { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 16px; }
 
-    .title {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .logo {
-      width: 40px; height: 40px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, rgba(59,130,246,0.3), rgba(167,139,250,0.3));
-      display: grid; place-items: center;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06), var(--shadow);
-    }
+    .title { display: flex; align-items: center; gap: 14px; }
+    .logo { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, rgba(59,130,246,0.3), rgba(167,139,250,0.3)); display: grid; place-items: center; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06), var(--shadow); }
     .logo svg { opacity: 0.9 }
-    h1 {
-      font-size: 20px; margin: 0;
-      letter-spacing: 0.2px;
-    }
-    .subtitle {
-      margin-top: 4px;
-      color: var(--text-dim);
-      font-size: 13px;
-    }
+    h1 { font-size: 20px; margin: 0; letter-spacing: 0.2px; }
+    .subtitle { margin-top: 4px; color: var(--text-dim); font-size: 13px; }
 
-    /* Cards */
-    .card {
-      background: linear-gradient(180deg, var(--panel), var(--panel-2));
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      margin-bottom: 18px;
-    }
-    .card .card-header {
-      padding: 14px 16px 10px;
-      border-bottom: 1px solid var(--border);
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+    .card { background: linear-gradient(180deg, var(--panel), var(--panel-2)); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 18px; }
+    .card .card-header { padding: 14px 16px 10px; border-bottom: 1px solid var(--border); background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); display: flex; align-items: center; justify-content: space-between; }
     .card .card-body { padding: 16px; }
 
-    /* Collapsible behavior */
     .card-header.toggle { cursor: pointer; user-select: none; }
-    .chev {
-      display: inline-block;
-      transform: rotate(0deg);
-      transition: transform 0.2s ease;
-      margin-right: 8px;
-      opacity: 0.9;
-    }
+    .chev { display: inline-block; transform: rotate(0deg); transition: transform 0.2s ease; margin-right: 8px; opacity: 0.9; }
     .collapsible .card-body { display: none; }
     .collapsible.open .card-body { display: block; }
     .collapsible.open .chev { transform: rotate(90deg); }
 
-    /* Create/Edit visual modes */
     #user-panel.mode-create { border-left: 3px solid var(--primary); }
     #user-panel.mode-edit   { border-left: 3px solid var(--warning); }
     #user-panel.mode-create .card-header { border-bottom-color: rgba(59,130,246,0.35); }
     #user-panel.mode-edit .card-header   { border-bottom-color: rgba(251,191,36,0.35); }
 
-    .fields {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-    @media (max-width: 640px) {
-      .fields { grid-template-columns: 1fr; }
-    }
+    .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 640px) { .fields { grid-template-columns: 1fr; } }
 
-    label {
-      color: var(--text-dim);
-      font-size: 12px;
-      display: block;
-      margin-bottom: 6px;
-      letter-spacing: 0.2px;
-    }
+    label { color: var(--text-dim); font-size: 12px; display: block; margin-bottom: 6px; letter-spacing: 0.2px; }
 
-    .field {
-      background: #0e1420;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 8px 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-    }
-    .field:focus-within {
-      border-color: rgba(59,130,246,0.6);
-      box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
-      background: #0f1624;
-    }
-    .field input, .field select {
-      width: 100%;
-      background: transparent;
-      border: 0;
-      color: var(--text);
-      outline: none;
-      font-size: 14px;
-      padding: 6px 4px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-    }
+    .field { background: #0e1420; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; display: flex; align-items: center; gap: 8px; transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease; }
+    .field:focus-within { border-color: rgba(59,130,246,0.6); box-shadow: 0 0 0 3px rgba(59,130,246,0.15); background: #0f1624; }
+    .field input, .field select { width: 100%; background: transparent; border: 0; color: var(--text); outline: none; font-size: 14px; padding: 6px 4px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
 
     .muted { color: var(--muted); font-size: 12px; }
     .subtle { color: var(--text-dim); font-size: 12px; }
@@ -166,137 +82,51 @@
     .inline { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .row-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
 
-    .btn {
-      appearance: none; border: 0; cursor: pointer;
-      padding: 8px 12px;
-      border-radius: 10px;
-      color: white; font-weight: 600; letter-spacing: 0.2px;
-      background: #1b2637;
-      border: 1px solid var(--border);
-      transition: transform 0.04s ease, background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
-    }
+    .btn { appearance: none; border: 0; cursor: pointer; padding: 8px 12px; border-radius: 10px; color: white; font-weight: 600; letter-spacing: 0.2px; background: #1b2637; border: 1px solid var(--border); transition: transform 0.04s ease, background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease; }
     .btn:hover { background: #213149; }
     .btn:active { transform: translateY(1px); }
     .btn-sm { padding: 6px 9px; border-radius: 8px; font-weight: 600; }
-    .btn-primary {
-      background: linear-gradient(180deg, var(--primary), var(--primary-600));
-      border-color: rgba(59,130,246,0.4);
-      box-shadow: 0 8px 20px rgba(37,99,235,0.25);
-    }
-    .btn-ghost {
-      background: transparent; border-color: var(--border); color: var(--text);
-    }
-    .btn-danger {
-      background: linear-gradient(180deg, var(--danger), var(--danger-600));
-      border-color: rgba(239,68,68,0.4);
-      box-shadow: 0 8px 20px rgba(220,38,38,0.25);
-    }
+    .btn-primary { background: linear-gradient(180deg, var(--primary), var(--primary-600)); border-color: rgba(59,130,246,0.4); box-shadow: 0 8px 20px rgba(37,99,235,0.25); }
+    .btn-ghost { background: transparent; border-color: var(--border); color: var(--text); }
+    .btn-danger { background: linear-gradient(180deg, var(--danger), var(--danger-600)); border-color: rgba(239,68,68,0.4); box-shadow: 0 8px 20px rgba(220,38,38,0.25); }
 
-    .badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-size: 12px; padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      color: var(--text);
-      background: rgba(255,255,255,0.02);
-    }
+    .badge { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--border); color: var(--text); background: rgba(255,255,255,0.02); }
     .badge-success { border-color: rgba(34,197,94,0.35); background: rgba(34,197,94,0.12); color: #bbf7d0; }
     .badge-danger  { border-color: rgba(239,68,68,0.35); background: rgba(239,68,68,0.12); color: #fecaca; }
     .badge-muted   { border-color: rgba(148,163,184,0.35); background: rgba(148,163,184,0.10); color: #cbd5e1; }
     .badge-primary { border-color: rgba(59,130,246,0.40); background: rgba(59,130,246,0.18); color: #cfe1ff; }
     .badge-warning { border-color: rgba(251,191,36,0.40); background: rgba(251,191,36,0.16); color: #fde68a; }
 
-    .dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      box-shadow: 0 0 0 3px rgba(255,255,255,0.02) inset;
-    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 0 3px rgba(255,255,255,0.02) inset; }
     .dot.live { background: var(--success); box-shadow: 0 0 10px rgba(34,197,94,0.6); }
     .dot.idle { background: #64748b; }
     .dot.enabled { background: #10b981; }
     .dot.disabled { background: #ef4444; }
 
-    table {
-      width: 100%; border-collapse: separate; border-spacing: 0;
-      border: 1px solid var(--border); border-radius: var(--radius);
-      overflow: hidden; box-shadow: var(--shadow);
-      background: linear-gradient(180deg, var(--panel), var(--panel-2));
-    }
-    thead th {
-      text-align: left; font-weight: 700; font-size: 12px; letter-spacing: 0.4px;
-      color: var(--text-dim);
-      background: rgba(255,255,255,0.03);
-      border-bottom: 1px solid var(--border);
-      padding: 12px 12px;
-      position: sticky; top: 0; z-index: 1;
-      backdrop-filter: blur(6px);
-      user-select: none;
-    }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); background: linear-gradient(180deg, var(--panel), var(--panel-2)); }
+    thead th { text-align: left; font-weight: 700; font-size: 12px; letter-spacing: 0.4px; color: var(--text-dim); background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--border); padding: 12px 12px; position: sticky; top: 0; z-index: 1; backdrop-filter: blur(6px); user-select: none; }
     thead th.sortable { cursor: pointer; }
     thead th.sortable:hover { background: rgba(59,130,246,0.10); }
-    thead th .sort-indicator {
-      margin-left: 6px; opacity: 0.6; font-size: 10px;
-    }
+    thead th .sort-indicator { margin-left: 6px; opacity: 0.6; font-size: 10px; }
     thead th.sorted .sort-indicator { opacity: 1; }
 
-    tbody td {
-      padding: 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      vertical-align: top;
-    }
+    tbody td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: top; }
     tbody tr:hover td { background: rgba(59,130,246,0.05); }
     .nowrap { white-space: nowrap; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
 
-    .url-box {
-      display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: start;
-      max-width: 560px;
-    }
-    .url-code {
-      display: block;
-      max-width: 100%;
-      overflow-wrap: anywhere;
-      background: #0c1422;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xs);
-      padding: 8px 10px;
-      font-size: 12px;
-      color: #dce6ff;
-      line-height: 1.25;
-      max-height: calc(1.25em * 3);
-      overflow: auto;
-    }
+    .url-box { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: start; max-width: 560px; }
+    .url-code { display: block; max-width: 100%; overflow-wrap: anywhere; background: #0c1422; border: 1px solid var(--border); border-radius: var(--radius-xs); padding: 8px 10px; font-size: 12px; color: #dce6ff; line-height: 1.25; max-height: calc(1.25em * 3); overflow: auto; }
 
-    .toast {
-      position: fixed; bottom: 18px; right: 18px;
-      background: #0e1726;
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 10px 12px;
-      border-radius: 10px;
-      box-shadow: var(--shadow);
-      min-width: 160px;
-      display: flex; align-items: center; gap: 10px;
-      animation: toastIn 220ms ease-out forwards;
-      z-index: 9999;
-      font-size: 13px;
-    }
-    @keyframes toastIn { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: translateY(0) } }
+    .toast { position: fixed; bottom: 18px; right: 18px; background: #0e1726; border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: 10px; box-shadow: var(--shadow); min-width: 160px; display: flex; align-items: center; gap: 10px; animation: toastIn 220ms ease-out forwards; z-index: 9999; font-size: 13px; }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Filter bar */
     .filter-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
     .filter-input { min-width: 220px; }
 
     /* QR modal */
-    .qr-backdrop {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-      display: grid; place-items: center; z-index: 10000;
-      animation: fadeIn .15s ease-out;
-    }
-    .qr-modal {
-      background: #0e1726; border: 1px solid var(--border);
-      border-radius: 12px; padding: 16px; width: 360px; max-width: calc(100% - 32px);
-      box-shadow: var(--shadow);
-    }
+    .qr-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: grid; place-items: center; z-index: 10000; animation: fadeIn .15s ease-out; }
+    .qr-modal { background: #0e1726; border: 1px solid var(--border); border-radius: 12px; padding: 16px; width: 360px; max-width: calc(100% - 32px); box-shadow: var(--shadow); }
     .qr-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
     .qr-title { font-weight: 700; }
     .qr-close { border: 1px solid var(--border); background: transparent; color: var(--text); border-radius: 8px; padding: 4px 8px; cursor: pointer; }
@@ -420,7 +250,7 @@
             <input id="filterText" placeholder="Filter by username or display name…">
           </div>
           <button class="btn btn-ghost btn-sm" id="clearFilter">Clear</button>
-          <span class="subtle">Refreshes every 5s. Live = traffic delta ≥ 300 B.</span>
+          <span class="subtle">Refreshes every 5s. Online if any traffic in the last 30s.</span>
         </div>
       </div>
       <div class="card-body" style="padding:0;">
@@ -485,9 +315,12 @@
       setTimeout(() => el.remove(), 2600);
     }
 
-    // Visible-rows usage tracking (for Live badge)
-    let visibleUsage = new Map(); // id -> BigInt(used_bytes)
-    const LIVE_THRESHOLD = 300n;
+    // Online status logic
+    let visibleUsage = new Map(); // id -> BigInt(used_bytes) previous sample
+    const TRAFFIC_DELTA_THRESHOLD = 1n; // any positive delta counts as traffic
+    const ONLINE_WINDOW_MS = 30_000; // 30 seconds
+    let lastActiveMs = new Map(); // id -> last activity timestamp (ms)
+    let firstSeenMs = new Map(); // id -> first time we saw the user in the table (ms)
 
     // Sort/Filter state
     let sortKey = 'id';
@@ -508,10 +341,7 @@
       do { crypto.getRandomValues(arr); x = arr[0]; } while (x >= buckets);
       return x % max;
     }
-    function shuffleArraySecure(arr) {
-      for (let i = arr.length - 1; i > 0; i--) { const j = getRandomInt(i + 1); [arr[i], arr[j]] = [arr[j], arr[i]]; }
-      return arr;
-    }
+    function shuffleArraySecure(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = getRandomInt(i + 1); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
     function randomPassword(len) {
       const length = Math.min(64, Math.max(8, Number(len) || 16));
       const lower = "abcdefghjkmnpqrstuvwxyz";
@@ -571,7 +401,6 @@
     }
 
     function isEnabled(u) {
-      // Fallback if backend doesn't send enabled
       try {
         if (u.remaining_bytes != null && String(u.remaining_bytes) !== "-1") {
           const rb = BigInt(u.remaining_bytes);
@@ -586,9 +415,8 @@
     }
 
     // Tehran timezone conversions (fixed UTC+3:30)
-    const TEHRAN_OFFSET_MIN = 210; // 3*60 + 30
+    const TEHRAN_OFFSET_MIN = 210;
 
-    // Convert UTC "YYYY-MM-DD HH:mm[:ss]" or ISO to input "YYYY-MM-DDTHH:MM" in Tehran time
     function utcSqlToTehranInput(utcStr) {
       try {
         if (!utcStr) return '';
@@ -615,7 +443,6 @@
       }
     }
 
-    // Convert input "YYYY-MM-DDTHH:MM" (Tehran) to UTC "YYYY-MM-DD HH:mm:ss"
     function tehranInputToUtcSql(input) {
       try {
         if (!input) return null;
@@ -652,12 +479,7 @@
     let quotaDirty = false;
     let expiresDirty = false;
 
-    function resetDirty() {
-      usernameDirty = false;
-      passwordDirty = false;
-      quotaDirty = false;
-      expiresDirty = false;
-    }
+    function resetDirty() { usernameDirty = false; passwordDirty = false; quotaDirty = false; expiresDirty = false; }
 
     // Form helpers
     $('#quota_unit').addEventListener('change', (e) => { $('#quota_value').disabled = e.target.value !== 'gb'; });
@@ -775,10 +597,8 @@
       if (!th) return;
       if (th.getAttribute('data-sortable') === 'false') return;
       if (!th.classList.contains('sortable')) return;
-
       const key = th.getAttribute('data-key');
       if (!key) return;
-
       if (sortKey === key) {
         sortDir = (sortDir === 'asc') ? 'desc' : 'asc';
       } else {
@@ -860,17 +680,34 @@
     }
 
     function renderTable() {
+      const now = Date.now();
       const list = Array.from(currentUsers.values());
       let view = applyFilter(list);
 
       const computed = view.map(u => {
         const id = String(u.id);
-        let live = null;
+        // ensure we have a "first seen" timestamp
+        if (!firstSeenMs.has(id)) firstSeenMs.set(id, now);
+
+        // compute traffic delta if we have a previous sample
         if (visibleUsage.has(id)) {
           const prev = visibleUsage.get(id);
           const delta = u.usedB - prev;
-          live = (delta >= 0n) ? (delta >= LIVE_THRESHOLD) : null;
+          if (delta >= TRAFFIC_DELTA_THRESHOLD) {
+            lastActiveMs.set(id, now);
+          }
+          // negative delta (reset) -> ignore
         }
+
+        // determine live
+        let live;
+        if (lastActiveMs.has(id)) {
+          live = (now - lastActiveMs.get(id)) < ONLINE_WINDOW_MS;
+        } else {
+          // no traffic observed yet; after 30s from first seen, mark offline
+          live = (now - firstSeenMs.get(id)) >= ONLINE_WINDOW_MS ? false : null;
+        }
+
         return { ...u, live };
       });
 
@@ -881,9 +718,9 @@
       for (const u of view) {
         const liveBadge =
           u.live === true
-            ? `<span class="badge badge-success" title="Traffic increased ≥ 300 B in the last interval"><span class="dot live"></span>Online</span>`
+            ? `<span class="badge badge-success" title="Traffic observed within last 30s"><span class="dot live"></span>Online</span>`
             : u.live === false
-              ? `<span class="badge badge-muted" title="No meaningful traffic in the last interval"><span class="dot idle"></span>Idle</span>`
+              ? `<span class="badge badge-muted" title="No traffic in the last 30s"><span class="dot idle"></span>Offline</span>`
               : `<span class="badge badge-muted" title="Collecting baseline to detect activity">Detecting…</span>`;
 
         const enabledBadge = u.enabled
@@ -927,11 +764,14 @@
       tbody.innerHTML = '';
       tbody.appendChild(frag);
 
+      // Update snapshot for next delta computation
       const nextVisible = new Map();
-      for (const u of view) {
-        nextVisible.set(String(u.id), u.usedB);
-      }
+      for (const u of view) nextVisible.set(String(u.id), u.usedB);
       visibleUsage = nextVisible;
+
+      // Cleanup maps for users that disappeared
+      for (const id of Array.from(lastActiveMs.keys())) if (!currentUsers.has(id)) lastActiveMs.delete(id);
+      for (const id of Array.from(firstSeenMs.keys())) if (!currentUsers.has(id)) firstSeenMs.delete(id);
     }
 
     // Load QRCode library on-demand from CDN
@@ -950,82 +790,43 @@
     async function openQrModal(url, title) {
       if (!url) { toast('No URL to show'); return; }
       const ok = await ensureQRCodeLoaded();
-      if (!ok || !window.QRCode) {
-        toast('QR library failed to load');
-        return;
-      }
+      if (!ok || !window.QRCode) { toast('QR library failed to load'); return; }
 
       const backdrop = document.createElement('div');
       backdrop.className = 'qr-backdrop';
       backdrop.addEventListener('click', (e) => { if (e.target === backdrop) document.body.removeChild(backdrop); });
 
-      const modal = document.createElement('div');
-      modal.className = 'qr-modal';
-
-      const header = document.createElement('div');
-      header.className = 'qr-header';
-      const hTitle = document.createElement('div');
-      hTitle.className = 'qr-title';
-      hTitle.textContent = title || 'trojan://';
-      const closeBtn = document.createElement('button');
-      closeBtn.className = 'qr-close';
-      closeBtn.textContent = 'Close';
+      const modal = document.createElement('div'); modal.className = 'qr-modal';
+      const header = document.createElement('div'); header.className = 'qr-header';
+      const hTitle = document.createElement('div'); hTitle.className = 'qr-title'; hTitle.textContent = title || 'trojan://';
+      const closeBtn = document.createElement('button'); closeBtn.className = 'qr-close'; closeBtn.textContent = 'Close';
       closeBtn.addEventListener('click', () => document.body.removeChild(backdrop));
-      header.appendChild(hTitle);
-      header.appendChild(closeBtn);
+      header.appendChild(hTitle); header.appendChild(closeBtn);
 
-      const canvasWrap = document.createElement('div');
-      canvasWrap.className = 'qr-canvas';
-      canvasWrap.style.width = '260px';
-      canvasWrap.style.height = '260px';
+      const canvasWrap = document.createElement('div'); canvasWrap.className = 'qr-canvas'; canvasWrap.style.width = '260px'; canvasWrap.style.height = '260px';
+      const urlText = document.createElement('div'); urlText.className = 'qr-url mono'; urlText.textContent = url;
 
-      const urlText = document.createElement('div');
-      urlText.className = 'qr-url mono';
-      urlText.textContent = url;
-
-      const actions = document.createElement('div');
-      actions.className = 'qr-actions';
-      const copyBtn = document.createElement('button');
-      copyBtn.className = 'btn btn-sm';
-      copyBtn.textContent = 'Copy URL';
+      const actions = document.createElement('div'); actions.className = 'qr-actions';
+      const copyBtn = document.createElement('button'); copyBtn.className = 'btn btn-sm'; copyBtn.textContent = 'Copy URL';
       copyBtn.addEventListener('click', async () => {
         try {
           if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(url);
-          else {
-            const ta = document.createElement('textarea');
-            ta.value = url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
-          }
+          else { const ta = document.createElement('textarea'); ta.value = url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
           toast('URL copied');
         } catch { toast('Copy failed'); }
       });
-      const saveBtn = document.createElement('button');
-      saveBtn.className = 'btn btn-sm';
-      saveBtn.textContent = 'Save PNG';
+      const saveBtn = document.createElement('button'); saveBtn.className = 'btn btn-sm'; saveBtn.textContent = 'Save PNG';
       saveBtn.addEventListener('click', () => {
-        const canvas = canvasWrap.querySelector('canvas');
-        if (!canvas) return;
-        const a = document.createElement('a');
-        a.href = canvas.toDataURL('image/png');
-        a.download = (title || 'trojan') + '.png';
-        a.click();
+        const canvas = canvasWrap.querySelector('canvas'); if (!canvas) return;
+        const a = document.createElement('a'); a.href = canvas.toDataURL('image/png'); a.download = (title || 'trojan') + '.png'; a.click();
       });
-      actions.appendChild(copyBtn);
-      actions.appendChild(saveBtn);
+      actions.appendChild(copyBtn); actions.appendChild(saveBtn);
 
-      modal.appendChild(header);
-      modal.appendChild(canvasWrap);
-      modal.appendChild(urlText);
-      modal.appendChild(actions);
-      backdrop.appendChild(modal);
-      document.body.appendChild(backdrop);
+      modal.appendChild(header); modal.appendChild(canvasWrap); modal.appendChild(urlText); modal.appendChild(actions);
+      backdrop.appendChild(modal); document.body.appendChild(backdrop);
 
-      try {
-        const q = new QRCode(canvasWrap, { width: 240, height: 240, colorDark: '#000000', colorLight: '#ffffff' });
-        q.makeCode(url);
-      } catch (e) {
-        console.error(e);
-        toast('Failed to render QR');
-      }
+      try { const q = new QRCode(canvasWrap, { width: 240, height: 240, colorDark: '#000000', colorLight: '#ffffff' }); q.makeCode(url); }
+      catch (e) { console.error(e); toast('Failed to render QR'); }
     }
 
     // Table actions
@@ -1042,10 +843,7 @@
           if (!url) return;
           try {
             if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(url);
-            else {
-              const ta = document.createElement('textarea');
-              ta.value = url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
-            }
+            else { const ta = document.createElement('textarea'); ta.value = url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
             toast('URL copied');
           } catch { toast('Copy failed'); }
           return;
@@ -1185,6 +983,7 @@
       }
     });
 
+    // Initial load + polling (5s)
     enterCreateMode();
     loadUsers();
     setInterval(loadUsers, 5000);

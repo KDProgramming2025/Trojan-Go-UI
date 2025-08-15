@@ -1,5 +1,5 @@
 # Trojan-Go-UI
-A frontend UI for the https://github.com/p4gefau1t/trojan-go
+A simple UI for the https://github.com/p4gefau1t/trojan-go
 
 The API must be enabled in the Trojan-Go config.\
 Also the SQL must be enabled in the Trojan-Go config.

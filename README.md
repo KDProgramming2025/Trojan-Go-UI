@@ -43,7 +43,7 @@ Example `config.json`:
 In this config the `trojan_api` will be running on port 10001\
 The `listen` block is for nodejs 
 
-This config is assuming you have trojan-go running on port 10000 and have such config for the apache webserver:
+The above config is assuming you have trojan-go running on port 10000 and have such config for the apache webserver:
 ```
 <VirtualHost example.com:443>
 	ServerAdmin webmaster@localhost
@@ -74,7 +74,8 @@ This config is assuming you have trojan-go running on port 10000 and have such c
 
 ```
 
-The traffic on `https://example.com/whatever` will be forwarded to `ws://127.0.0.1:10000/whatever` by Apache's proxy. Look up "Apache reverse proxy"
+The traffic on `https://example.com/whatever` will be forwarded to `ws://127.0.0.1:10000/whatever` by Apache's proxy.\
+Look up "Apache reverse proxy"
 
 Example `/etc/trojan-go/config.json` for the above `server.js`'s `config.json`:
 ```
